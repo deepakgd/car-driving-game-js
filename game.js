@@ -7,7 +7,9 @@ class Game extends Phaser.Scene {
 
   preload() {
     // this.load.image('bg', 'assets/pics/the-end-by-iloe-and-made.jpg');
-    this.load.image("bg", "assets/images/backscroll.png");
+    this.load.image("bg", "assets/images/1.png");
+    this.load.image("snow", "assets/images/2.png");
+    this.load.image("foreground", "assets/images/3.png");
     this.load.image("car", "assets/images/car.png");
     this.load.image("block", "assets/images/block.png");
     this.load.spritesheet("blast", "assets/images/bomb.png", {
@@ -17,12 +19,16 @@ class Game extends Phaser.Scene {
   }
 
   create() {
-    this.cameras.main.setBounds(0, 0, 720 * 3, 175);
-    this.physics.world.setBounds(0, 0, 720 * 3, 175);
+    this.cameras.main.setBounds(0, 0, 720 * 10, 240);
+    this.physics.world.setBounds(0, 240, 1280 * 10, 400);
 
-    for (let x = 0; x < 3; x++) {
-      this.add.image(720 * x, 0, "bg").setOrigin(0);
+    for (let x = 0; x < 10; x++) {
+      this.add.image(490 * x, 220, "snow").setOrigin(0).setScrollFactor(1);
+      this.add.image(600 * x, 0, "bg").setOrigin(0).setScrollFactor(0.5);
+      this.add.image(1200 * x, 720, "foreground").setOrigin(1).setScrollFactor(1.3);
     }
+    
+
 
     this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -38,16 +44,16 @@ class Game extends Phaser.Scene {
     // var block1 = obstacles.create(200, 125, 'block');
 
     // obstacles
-    var obstacles = this.physics.add.staticGroup();
-    var block1 = obstacles.create(300, 125, "block");
-    var block2 = obstacles.create(450, 120, "block");
-    var block3 = obstacles.create(900, 120, "block");
-    block1.setScale(0.7).refreshBody();
-    block2.setScale(0.7).refreshBody();
-    block3.setScale(0.7).refreshBody();
+    // var obstacles = this.physics.add.staticGroup();
+    // var block1 = obstacles.create(300, 125, "block");
+    // var block2 = obstacles.create(450, 120, "block");
+    // var block3 = obstacles.create(900, 120, "block");
+    // block1.setScale(0.7).refreshBody();
+    // block2.setScale(0.7).refreshBody();
+    // block3.setScale(0.7).refreshBody();
     // block1.visible = false;
     // add collision
-    this.physics.add.collider(this.player, obstacles, this.hitBlock.bind(this));
+    // this.physics.add.collider(this.player, obstacles, this.hitBlock.bind(this));
 
     this.anims.create({
       key: "left",
@@ -59,7 +65,7 @@ class Game extends Phaser.Scene {
     // this.player.body.setMaxSpeed(500);
 
     this.cameras.main.startFollow(this.player, true);
-    this.cameras.main.setZoom(2);
+    // this.cameras.main.setZoom(2);
   }
 
   update() {
@@ -131,8 +137,8 @@ const config = {
     parent: "game-area",
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 800,
-    height: 350,
+    width: 1280,
+    height: 720,
   },
   pixelArt: true,
   physics: {
