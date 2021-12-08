@@ -20,20 +20,25 @@ class Game extends Phaser.Scene {
 
   create() {
     this.cameras.main.setBounds(0, 0, 720 * 10, 240);
-    this.physics.world.setBounds(0, 240, 1280 * 10, 400);
+    this.physics.world.setBounds(0, 240, 720 * 10, 375);
 
-    for (let x = 0; x < 10; x++) {
+    for (let x = 0; x < 15; x++) {
       this.add.image(490 * x, 220, "snow").setOrigin(0).setScrollFactor(1);
       this.add.image(600 * x, 0, "bg").setOrigin(0).setScrollFactor(0.5);
-      this.add.image(1200 * x, 720, "foreground").setOrigin(1).setScrollFactor(1.3);
     }
-    
+
+    // added separate loop to fix snow and foreground overlap issue
+    for (let x = 0; x < 10; x++) {
+      this.add.image(1250 * x, 720, "foreground").setOrigin(1).setScrollFactor(1.3);
+    }
+
 
 
     this.cursors = this.input.keyboard.createCursorKeys();
 
     // this.player = this.physics.add.image(400, 100, 'block');
-    this.player = this.physics.add.image(100, 125, "car");
+    this.player = this.physics.add.image(100, 275, "car");
+    // this.player.setBodySize(65, 65, true)
     // this.player.setscale(1.5)
 
     // The sprite is then set to collide with the world bounds. The bounds, by default, are on the outside of the game dimensions. As we set the game to be 800 x 600 then the player won't be able to run outside of this area. It will stop the player from being able to run off the edges of the screen or jump through the top
@@ -72,41 +77,28 @@ class Game extends Phaser.Scene {
     const cam = this.cameras.main;
 
     this.player.setVelocity(0);
+    // console.log(this.player.x)
+    // 333 / 5 = 66.6
+    this.player.setVelocityX(100)
 
-    if (this.moveCam) {
-      if (this.cursors.left.isDown) {
-        cam.scrollX -= 4;
-      } else if (this.cursors.right.isDown) {
-        cam.scrollX += 4;
-      }
-
-      if (this.cursors.up.isDown) {
-        cam.scrollY -= 4;
-      } else if (this.cursors.down.isDown) {
-        cam.scrollY += 4;
-      }
+    if (this.cursors.left.isDown) {
+      // this.player.setVelocityX(-400);
+    } else if (this.cursors.right.isDown) {
+      // this.speed += 2;
+      // this.player.setVelocityX(this.speed);
     } else {
-      console.log("exe");
-      if (this.cursors.left.isDown) {
-        // this.player.setVelocityX(-400);
-      } else if (this.cursors.right.isDown) {
-        this.speed += 2;
-        this.player.setVelocityX(this.speed);
-        // this.player.setVelocityX(this.speed).setAccelerationX(this.speed);
-        // this.physics.velocityFromRotation(this.player.rotation, this.player.body.maxSpeed, this.player.body.acceleration);
-      } else {
-        if (this.speed > 0) {
-          this.speed -= 5;
-          this.player.setVelocityX(this.speed);
-        }
-      }
-
-      if (this.cursors.up.isDown) {
-        this.player.setVelocityY(-50);
-      } else if (this.cursors.down.isDown) {
-        this.player.setVelocityY(50);
-      }
+      // if (this.speed > 0) {
+      //   this.speed -= 5;
+      //   this.player.setVelocityX(this.speed);
+      // }
     }
+
+    if (this.cursors.up.isDown) {
+      this.player.setVelocityY(-50);
+    } else if (this.cursors.down.isDown) {
+      this.player.setVelocityY(50);
+    }
+
   }
 
   hitBlock() {
@@ -135,7 +127,7 @@ const config = {
   // height: 600,
   scale: {
     parent: "game-area",
-    mode: Phaser.Scale.FIT,
+    // mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: 1280,
     height: 720,
