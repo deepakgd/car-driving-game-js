@@ -2,6 +2,7 @@ class Game extends Phaser.Scene {
   constructor() {
     super();
     this.moveCam = false;
+    this.speed = 50;
   }
 
   preload() {
@@ -36,18 +37,15 @@ class Game extends Phaser.Scene {
     // var obstacles = this.physics.add.group({ collideWorldBounds: true });
     // var block1 = obstacles.create(200, 125, 'block');
 
+    // obstacles
     var obstacles = this.physics.add.staticGroup();
-
-
     var block1 = obstacles.create(300, 125, "block");
     var block2 = obstacles.create(450, 120, "block");
     var block3 = obstacles.create(900, 120, "block");
     block1.setScale(0.7).refreshBody();
     block2.setScale(0.7).refreshBody();
     block3.setScale(0.7).refreshBody();
-
     // block1.visible = false;
-
     // add collision
     this.physics.add.collider(this.player, obstacles, this.hitBlock.bind(this));
 
@@ -57,6 +55,8 @@ class Game extends Phaser.Scene {
       frameRate: 5,
       // repeat: -1
     });
+
+    // this.player.body.setMaxSpeed(500);
 
     this.cameras.main.startFollow(this.player, true);
     this.cameras.main.setZoom(2);
@@ -80,16 +80,25 @@ class Game extends Phaser.Scene {
         cam.scrollY += 4;
       }
     } else {
+      console.log("exe");
       if (this.cursors.left.isDown) {
-        this.player.setVelocityX(-400);
+        // this.player.setVelocityX(-400);
       } else if (this.cursors.right.isDown) {
-        this.player.setVelocityX(400);
+        this.speed += 2;
+        this.player.setVelocityX(this.speed);
+        // this.player.setVelocityX(this.speed).setAccelerationX(this.speed);
+        // this.physics.velocityFromRotation(this.player.rotation, this.player.body.maxSpeed, this.player.body.acceleration);
+      } else {
+        if (this.speed > 0) {
+          this.speed -= 5;
+          this.player.setVelocityX(this.speed);
+        }
       }
 
       if (this.cursors.up.isDown) {
-        this.player.setVelocityY(-400);
+        this.player.setVelocityY(-50);
       } else if (this.cursors.down.isDown) {
-        this.player.setVelocityY(400);
+        this.player.setVelocityY(50);
       }
     }
   }
@@ -97,7 +106,11 @@ class Game extends Phaser.Scene {
   hitBlock() {
     console.log("invoked");
     console.log(this.player);
-    this.bomb = this.physics.add.sprite(this.player.x, this.player.y-50, "blast");
+    this.bomb = this.physics.add.sprite(
+      this.player.x,
+      this.player.y - 50,
+      "blast"
+    );
     this.bomb.setScale(0.5).refreshBody();
     this.bomb.anims.play("left", true);
     this.player.disableBody(true, true);
