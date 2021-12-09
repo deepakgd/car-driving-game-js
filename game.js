@@ -1,9 +1,37 @@
 const textures = {
-  BACKGROUND: 'background',
-  FOREGROUND: 'foreground',
-  SNOWAREA: 'snowarea',
-  OBSTACLE_ONE: 'obstacle_one',
-  OBSTACLE_TWO: 'obstacle_two',
+  BACKGROUND: "background",
+  FOREGROUND: "foreground",
+  SNOWAREA: "snowarea",
+  BIKE: "bike",
+  OBSTACLE_ONE: "obstacle_one",
+  OBSTACLE_TWO: "obstacle_two",
+  OBSTACLE_THREE: "obstacle_three",
+  OBSTACLE_FOUR: "obstacle_four",
+  ICE_PATCH_ONE: "ice_patch_one"
+};
+
+
+const positions = {
+    desktop: {
+      obstacle1: { x: 1600, y: 265, texture: textures.OBSTACLE_ONE  },
+      obstacle2: { x: 2410, y: 570, texture: textures.OBSTACLE_TWO  },
+      obstacle3: { x: 3300, y: 460, texture: textures.OBSTACLE_THREE  },
+      obstacle4: { x: 5800, y: 480, texture: textures.OBSTACLE_FOUR   },
+      obstacle5: { x: 7100, y: 590, texture: textures.OBSTACLE_ONE   },
+      obstacle6: { x: 7680, y: 265, texture: textures.OBSTACLE_THREE   },
+      obstacle7: { x: 12800, y: 265, texture: textures.OBSTACLE_FOUR  },
+      icepatch1: { x: 9814, y: 460, texture: textures.ICE_PATCH_ONE  }
+    },
+    mobile: {
+      obstacle1: { x: 1600, y: 265, texture: textures.OBSTACLE_ONE  },
+      obstacle2: { x: 2410, y: 570, texture: textures.OBSTACLE_TWO  },
+      obstacle3: { x: 3300, y: 460, texture: textures.OBSTACLE_THREE  },
+      obstacle4: { x: 5800, y: 480, texture: textures.OBSTACLE_FOUR   },
+      obstacle5: { x: 7100, y: 590, texture: textures.OBSTACLE_ONE   },
+      obstacle6: { x: 7680, y: 265, texture: textures.OBSTACLE_THREE   },
+      obstacle7: { x: 12800, y: 265, texture: textures.OBSTACLE_FOUR  },
+      icepatch1: { x: 9814, y: 460, texture: textures.ICE_PATCH_ONE  }
+    }
 }
 
 class Game extends Phaser.Scene {
@@ -11,16 +39,25 @@ class Game extends Phaser.Scene {
     super();
     this.moveCam = false;
     this.speed = 50;
+    this.device = (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) ? 'mobile' : 'desktop';
   }
 
   preload() {
+
+    console.log(this.mobile)
     // this.load.image('bg', 'assets/pics/the-end-by-iloe-and-made.jpg');
     this.load.image(textures.BACKGROUND, "assets/images/1.png");
     this.load.image(textures.SNOWAREA, "assets/images/2.png");
     this.load.image(textures.FOREGROUND, "assets/images/3.png");
-    this.load.image("car", "assets/images/car.png");
+    this.load.spritesheet(textures.BIKE, "assets/images/bike.png", {
+      frameWidth: 74,
+      frameHeight: 65,
+    });
     this.load.image(textures.OBSTACLE_ONE, "assets/images/obstacle-1.png");
     this.load.image(textures.OBSTACLE_TWO, "assets/images/obstacle-2.png");
+    this.load.image(textures.OBSTACLE_THREE, "assets/images/obstacle-3.png");
+    this.load.image(textures.OBSTACLE_FOUR, "assets/images/obstacle-4.png");
+    this.load.image(textures.ICE_PATCH_ONE, "assets/images/icepatch-1.png");
     this.load.spritesheet("blast", "assets/images/bomb.png", {
       frameWidth: 128,
       frameHeight: 128,
@@ -29,33 +66,34 @@ class Game extends Phaser.Scene {
   }
 
   create() {
+    let gamePositions =  positions[this.device];
     this.cameras.main.setBounds(0, 0, this.totalWidth, 240);
-    this.physics.world.setBounds(0, 240, this.totalWidth, 370);
+    this.physics.world.setBounds(0, 170, this.totalWidth, 483);
 
-    // create repeated background 
+    // create repeated background
     let bgWidth = this.textures.get(textures.BACKGROUND).getSourceImage().width - 5;
     let bgCount = Math.ceil(this.totalWidth / bgWidth);
-    this.createRepeatedTexture(bgWidth, -2, textures.BACKGROUND, 0, 0.5, bgCount);
+    this.createRepeatedTexture(bgWidth, -2, textures.BACKGROUND, 0, 0.5, bgCount, 0);
 
     // create repeated snow area - game play area
     let snowWidth = this.textures.get(textures.SNOWAREA).getSourceImage().width - 5;
     let snowCount = Math.ceil(this.totalWidth / snowWidth);
-    this.createRepeatedTexture(snowWidth, 220, textures.SNOWAREA, 0, 1, snowCount);
+    this.createRepeatedTexture(snowWidth, 220, textures.SNOWAREA, 0, 1, snowCount, 0);
 
     // create foreground
     let fgWidth = this.textures.get(textures.FOREGROUND).getSourceImage().width - 5;
     let fgCount = Math.ceil(this.totalWidth / fgWidth) * 1.5;
-    this.createRepeatedTexture(fgWidth, 725, textures.FOREGROUND, 1, 1.3, fgCount);
+    this.createRepeatedTexture(fgWidth, 725, textures.FOREGROUND, 1, 1.3, fgCount, 1);
 
     // for (let x = 0; x < 15; x++) {
-      // this.add
-      //   .image(490 * x, 220, "snow")
-      //   .setOrigin(0)
-      //   .setScrollFactor(1);
-      // this.add
-      //   .image(600 * x, 0, "bg")
-      //   .setOrigin(0)
-      //   .setScrollFactor(0.5);
+    // this.add
+    //   .image(490 * x, 220, "snow")
+    //   .setOrigin(0)
+    //   .setScrollFactor(1);
+    // this.add
+    //   .image(600 * x, 0, "bg")
+    //   .setOrigin(0)
+    //   .setScrollFactor(0.5);
     // }
 
     // added separate loop to fix snow and foreground overlap issue
@@ -66,20 +104,43 @@ class Game extends Phaser.Scene {
     //     .setScrollFactor(1.3);
     // }
 
+
+    // create ice patch group
+    var icepatches = this.physics.add.group({ collideWorldBounds: true });
+    icepatches.create(gamePositions.icepatch1.x, gamePositions.icepatch1.y, gamePositions.icepatch1.texture);
+
     this.cursors = this.input.keyboard.createCursorKeys();
 
     // this.player = this.physics.add.image(400, 100, 'block');
-    this.player = this.physics.add.image(100, 275, "car");
-    // this.player.setBodySize(65, 65, true)
-    // this.player.setscale(1.5)
+    this.player = this.physics.add.sprite(100, 275, textures.BIKE);
+    // this.player.setBodySize(80, 65, true)
+    this.player.setScale(1.279);
 
     // The sprite is then set to collide with the world bounds. The bounds, by default, are on the outside of the game dimensions. As we set the game to be 800 x 600 then the player won't be able to run outside of this area. It will stop the player from being able to run off the edges of the screen or jump through the top
     this.player.setCollideWorldBounds(true);
+    this.anims.create({
+      key: "right",
+      frames: this.anims.generateFrameNumbers(textures.BIKE, {
+        start: 0,
+        end: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
 
     // create obstacles group
     var obstacles = this.physics.add.group({ collideWorldBounds: true });
-    obstacles.create(1600, 245, textures.OBSTACLE_ONE);
-    obstacles.create(2410, 512, textures.OBSTACLE_TWO).setOrigin(0);
+    obstacles.create(gamePositions.obstacle1.x, gamePositions.obstacle1.y, gamePositions.obstacle1.texture);
+    obstacles.create(gamePositions.obstacle2.x, gamePositions.obstacle2.y, gamePositions.obstacle2.texture);
+    obstacles.create(gamePositions.obstacle3.x, gamePositions.obstacle3.y, gamePositions.obstacle3.texture);
+    obstacles.create(gamePositions.obstacle4.x, gamePositions.obstacle4.y, gamePositions.obstacle4.texture);
+    obstacles.create(gamePositions.obstacle5.x, gamePositions.obstacle5.y, gamePositions.obstacle5.texture);
+    obstacles.create(gamePositions.obstacle6.x, gamePositions.obstacle6.y, gamePositions.obstacle6.texture);
+    obstacles.create(gamePositions.obstacle7.x, gamePositions.obstacle7.y, gamePositions.obstacle7.texture);
+  
+
+
+   
 
     // obstacles
     // var obstacles = this.physics.add.staticGroup();
@@ -110,9 +171,10 @@ class Game extends Phaser.Scene {
     const cam = this.cameras.main;
 
     this.player.setVelocity(0);
-    console.log(this.player.y)
+    console.log(this.player.y);
     // 333 / 5 = 66.6
     this.player.setVelocityX(100);
+    this.player.anims.play("right", true);
 
     if (this.cursors.left.isDown) {
       this.player.setVelocityX(0);
@@ -127,9 +189,9 @@ class Game extends Phaser.Scene {
     }
 
     if (this.cursors.up.isDown) {
-      this.player.setVelocityY(-50);
+      this.player.setVelocityY(-100);
     } else if (this.cursors.down.isDown) {
-      this.player.setVelocityY(50);
+      this.player.setVelocityY(100);
     }
   }
 
@@ -157,13 +219,14 @@ class Game extends Phaser.Scene {
    * @param {number} origin
    * @param {number} scrollFactor
    */
-   createRepeatedTexture(width, height, texture, origin, scrollFactor, count) {
+  createRepeatedTexture(width, height, texture, origin, scrollFactor, count, depth) {
     let x = -2;
     for (let i = 0; i < count; i++) {
       const m = this.add
         .image(x, height, texture)
         .setOrigin(origin)
-        .setScrollFactor(scrollFactor);
+        .setScrollFactor(scrollFactor)
+        .setDepth(depth)
 
       x += width;
     }
