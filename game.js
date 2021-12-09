@@ -1,7 +1,9 @@
 const textures = {
   BACKGROUND: 'background',
   FOREGROUND: 'foreground',
-  SNOWAREA: 'snowarea'
+  SNOWAREA: 'snowarea',
+  OBSTACLE_ONE: 'obstacle_one',
+  OBSTACLE_TWO: 'obstacle_two',
 }
 
 class Game extends Phaser.Scene {
@@ -17,7 +19,8 @@ class Game extends Phaser.Scene {
     this.load.image(textures.SNOWAREA, "assets/images/2.png");
     this.load.image(textures.FOREGROUND, "assets/images/3.png");
     this.load.image("car", "assets/images/car.png");
-    this.load.image("block", "assets/images/block.png");
+    this.load.image(textures.OBSTACLE_ONE, "assets/images/obstacle-1.png");
+    this.load.image(textures.OBSTACLE_TWO, "assets/images/obstacle-2.png");
     this.load.spritesheet("blast", "assets/images/bomb.png", {
       frameWidth: 128,
       frameHeight: 128,
@@ -27,7 +30,7 @@ class Game extends Phaser.Scene {
 
   create() {
     this.cameras.main.setBounds(0, 0, this.totalWidth, 240);
-    this.physics.world.setBounds(0, 240, this.totalWidth, 375);
+    this.physics.world.setBounds(0, 240, this.totalWidth, 370);
 
     // create repeated background 
     let bgWidth = this.textures.get(textures.BACKGROUND).getSourceImage().width - 5;
@@ -74,8 +77,9 @@ class Game extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
 
     // create obstacles group
-    // var obstacles = this.physics.add.group({ collideWorldBounds: true });
-    // var block1 = obstacles.create(200, 125, 'block');
+    var obstacles = this.physics.add.group({ collideWorldBounds: true });
+    obstacles.create(1600, 245, textures.OBSTACLE_ONE);
+    obstacles.create(2410, 512, textures.OBSTACLE_TWO).setOrigin(0);
 
     // obstacles
     // var obstacles = this.physics.add.staticGroup();
@@ -111,7 +115,7 @@ class Game extends Phaser.Scene {
     this.player.setVelocityX(100);
 
     if (this.cursors.left.isDown) {
-      // this.player.setVelocityX(-400);
+      this.player.setVelocityX(0);
     } else if (this.cursors.right.isDown) {
       this.speed += 20;
       this.player.setVelocityX(this.speed);
