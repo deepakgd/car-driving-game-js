@@ -1,3 +1,9 @@
+const textures = {
+  BACKGROUND: 'background',
+  FOREGROUND: 'foreground',
+  SNOWAREA: 'snowarea'
+}
+
 class Game extends Phaser.Scene {
   constructor() {
     super();
@@ -7,32 +13,55 @@ class Game extends Phaser.Scene {
 
   preload() {
     // this.load.image('bg', 'assets/pics/the-end-by-iloe-and-made.jpg');
-    this.load.image("bg", "assets/images/1.png");
-    this.load.image("snow", "assets/images/2.png");
-    this.load.image("foreground", "assets/images/3.png");
+    this.load.image(textures.BACKGROUND, "assets/images/1.png");
+    this.load.image(textures.SNOWAREA, "assets/images/2.png");
+    this.load.image(textures.FOREGROUND, "assets/images/3.png");
     this.load.image("car", "assets/images/car.png");
     this.load.image("block", "assets/images/block.png");
     this.load.spritesheet("blast", "assets/images/bomb.png", {
       frameWidth: 128,
       frameHeight: 128,
     });
+    this.totalWidth = this.scale.width * 20;
   }
 
   create() {
-    this.cameras.main.setBounds(0, 0, 720 * 10, 240);
-    this.physics.world.setBounds(0, 240, 720 * 10, 375);
+    this.cameras.main.setBounds(0, 0, this.totalWidth, 240);
+    this.physics.world.setBounds(0, 240, this.totalWidth, 375);
 
-    for (let x = 0; x < 15; x++) {
-      this.add.image(490 * x, 220, "snow").setOrigin(0).setScrollFactor(1);
-      this.add.image(600 * x, 0, "bg").setOrigin(0).setScrollFactor(0.5);
-    }
+    // create repeated background 
+    let bgWidth = this.textures.get(textures.BACKGROUND).getSourceImage().width - 5;
+    let bgCount = Math.ceil(this.totalWidth / bgWidth);
+    this.createRepeatedTexture(bgWidth, -2, textures.BACKGROUND, 0, 0.5, bgCount);
+
+    // create repeated snow area - game play area
+    let snowWidth = this.textures.get(textures.SNOWAREA).getSourceImage().width - 5;
+    let snowCount = Math.ceil(this.totalWidth / snowWidth);
+    this.createRepeatedTexture(snowWidth, 220, textures.SNOWAREA, 0, 1, snowCount);
+
+    // create foreground
+    let fgWidth = this.textures.get(textures.FOREGROUND).getSourceImage().width - 5;
+    let fgCount = Math.ceil(this.totalWidth / fgWidth) * 1.5;
+    this.createRepeatedTexture(fgWidth, 725, textures.FOREGROUND, 1, 1.3, fgCount);
+
+    // for (let x = 0; x < 15; x++) {
+      // this.add
+      //   .image(490 * x, 220, "snow")
+      //   .setOrigin(0)
+      //   .setScrollFactor(1);
+      // this.add
+      //   .image(600 * x, 0, "bg")
+      //   .setOrigin(0)
+      //   .setScrollFactor(0.5);
+    // }
 
     // added separate loop to fix snow and foreground overlap issue
-    for (let x = 0; x < 10; x++) {
-      this.add.image(1250 * x, 720, "foreground").setOrigin(1).setScrollFactor(1.3);
-    }
-
-
+    // for (let x = 0; x < 10; x++) {
+    //   this.add
+    //     .image(1250 * x, 720, "foreground")
+    //     .setOrigin(1)
+    //     .setScrollFactor(1.3);
+    // }
 
     this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -77,15 +106,15 @@ class Game extends Phaser.Scene {
     const cam = this.cameras.main;
 
     this.player.setVelocity(0);
-    // console.log(this.player.x)
+    console.log(this.player.y)
     // 333 / 5 = 66.6
-    this.player.setVelocityX(100)
+    this.player.setVelocityX(100);
 
     if (this.cursors.left.isDown) {
       // this.player.setVelocityX(-400);
     } else if (this.cursors.right.isDown) {
-      // this.speed += 2;
-      // this.player.setVelocityX(this.speed);
+      this.speed += 20;
+      this.player.setVelocityX(this.speed);
     } else {
       // if (this.speed > 0) {
       //   this.speed -= 5;
@@ -98,7 +127,6 @@ class Game extends Phaser.Scene {
     } else if (this.cursors.down.isDown) {
       this.player.setVelocityY(50);
     }
-
   }
 
   hitBlock() {
@@ -117,6 +145,24 @@ class Game extends Phaser.Scene {
       console.log("invoked bomb");
       this.bomb.disableBody(true, true);
     });
+  }
+
+  /**
+   * createRepeatedTexture
+   * @param {string} texture
+   * @param {number} origin
+   * @param {number} scrollFactor
+   */
+   createRepeatedTexture(width, height, texture, origin, scrollFactor, count) {
+    let x = -2;
+    for (let i = 0; i < count; i++) {
+      const m = this.add
+        .image(x, height, texture)
+        .setOrigin(origin)
+        .setScrollFactor(scrollFactor);
+
+      x += width;
+    }
   }
 }
 
