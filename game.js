@@ -7,9 +7,11 @@ const textures = {
   OBSTACLE_TWO: "obstacle_two",
   OBSTACLE_THREE: "obstacle_three",
   OBSTACLE_FOUR: "obstacle_four",
-  ICE_PATCH_ONE: "ice_patch_one"
+  ICE_PATCH_ONE: "ice_patch_one",
+  ICE_PATCH_TWO: "ice_patch_two",
+  DROP_ONE: "drop_one"
 };
-
+// 20480
 
 const positions = {
     desktop: {
@@ -20,7 +22,16 @@ const positions = {
       obstacle5: { x: 7100, y: 590, texture: textures.OBSTACLE_ONE   },
       obstacle6: { x: 7680, y: 265, texture: textures.OBSTACLE_THREE   },
       obstacle7: { x: 12800, y: 265, texture: textures.OBSTACLE_FOUR  },
-      icepatch1: { x: 9814, y: 460, texture: textures.ICE_PATCH_ONE  }
+      icepatch1: { x: 9814, y: 460, texture: textures.ICE_PATCH_ONE  },
+      drop1: { x: 12600, y: 540, texture: textures.DROP_ONE },
+      obstacle8: { x: 13800, y: 390, texture: textures.OBSTACLE_TWO },
+      obstacle9: { x: 16180, y: 430, texture: textures.OBSTACLE_FOUR  },
+      obstacle10: { x: 17040, y: 280, texture: textures.OBSTACLE_THREE  },
+      obstacle11: { x: 17820, y: 590, texture: textures.OBSTACLE_ONE  },
+      obstacle12: { x: 19200, y: 480, texture: textures.OBSTACLE_TWO  },
+      icepatch2: { x: 20500, y: 450, texture: textures.ICE_PATCH_TWO },
+      obstacle13: { x: 21760, y: 360, texture: textures.OBSTACLE_FOUR },
+      obstacle14: { x: 24020, y: 500, texture: textures.OBSTACLE_THREE },
     },
     mobile: {
       obstacle1: { x: 1600, y: 265, texture: textures.OBSTACLE_ONE  },
@@ -58,6 +69,8 @@ class Game extends Phaser.Scene {
     this.load.image(textures.OBSTACLE_THREE, "assets/images/obstacle-3.png");
     this.load.image(textures.OBSTACLE_FOUR, "assets/images/obstacle-4.png");
     this.load.image(textures.ICE_PATCH_ONE, "assets/images/icepatch-1.png");
+    this.load.image(textures.ICE_PATCH_TWO, "assets/images/icepatch-2.png");
+    this.load.image(textures.DROP_ONE, "assets/images/drop1.png");
     this.load.spritesheet("blast", "assets/images/bomb.png", {
       frameWidth: 128,
       frameHeight: 128,
@@ -108,7 +121,13 @@ class Game extends Phaser.Scene {
     // create ice patch group
     var icepatches = this.physics.add.group({ collideWorldBounds: true });
     icepatches.create(gamePositions.icepatch1.x, gamePositions.icepatch1.y, gamePositions.icepatch1.texture);
+    icepatches.create(gamePositions.icepatch2.x, gamePositions.icepatch2.y, gamePositions.icepatch2.texture);
 
+    // create ice drop
+    var drops = this.physics.add.group({ collideWorldBounds: true });
+    drops.create(gamePositions.drop1.x, gamePositions.drop1.y, gamePositions.drop1.texture)
+    
+    // keyboard event listener
     this.cursors = this.input.keyboard.createCursorKeys();
 
     // this.player = this.physics.add.image(400, 100, 'block');
@@ -137,6 +156,13 @@ class Game extends Phaser.Scene {
     obstacles.create(gamePositions.obstacle5.x, gamePositions.obstacle5.y, gamePositions.obstacle5.texture);
     obstacles.create(gamePositions.obstacle6.x, gamePositions.obstacle6.y, gamePositions.obstacle6.texture);
     obstacles.create(gamePositions.obstacle7.x, gamePositions.obstacle7.y, gamePositions.obstacle7.texture);
+    obstacles.create(gamePositions.obstacle8.x, gamePositions.obstacle8.y, gamePositions.obstacle8.texture);
+    obstacles.create(gamePositions.obstacle9.x, gamePositions.obstacle9.y, gamePositions.obstacle9.texture);
+    obstacles.create(gamePositions.obstacle10.x, gamePositions.obstacle10.y, gamePositions.obstacle10.texture);
+    obstacles.create(gamePositions.obstacle11.x, gamePositions.obstacle11.y, gamePositions.obstacle11.texture);
+    obstacles.create(gamePositions.obstacle12.x, gamePositions.obstacle12.y, gamePositions.obstacle12.texture);
+    obstacles.create(gamePositions.obstacle13.x, gamePositions.obstacle13.y, gamePositions.obstacle13.texture);
+    obstacles.create(gamePositions.obstacle14.x, gamePositions.obstacle14.y, gamePositions.obstacle14.texture);
   
 
 
